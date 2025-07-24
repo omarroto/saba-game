@@ -1,85 +1,78 @@
-
+// script.js
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-const pad = {
-  x: 130,
-  y: 460,
-  width: 40,
-  height: 20,
-  speed: 5,
-  moveLeft: false,
-  moveRight: false
-};
+// Cargar imágenes
+const toallaImg = new Image();
+toallaImg.src = "assets/saba.png";
 
-const drops = [];
-let score = 0;
+const gotaImg = new Image();
+gotaImg.src = "assets/gota_sangre.png";
 
-function createDrop() {
-  const x = Math.random() * (canvas.width - 10);
-  drops.push({ x, y: 0, size: 10 });
+// Posición inicial de la toalla
+let toallaX = canvas.width / 2 - 50;
+const toallaY = canvas.height - 80;
+const toallaWidth = 100;
+const toallaHeight = 50;
+
+// Gotas
+let gotas = [];
+const gotaWidth = 20;
+const gotaHeight = 30;
+
+function crearGota() {
+  const x = Math.random() * (canvas.width - gotaWidth);
+  gotas.push({ x: x, y: 0 });
 }
 
-function drawPad() {
-  ctx.fillStyle = "#e91e63";
-  ctx.fillRect(pad.x, pad.y, pad.width, pad.height);
+function moverToalla(e) {
+  if (e.key === "ArrowLeft") {
+    toallaX -= 20;
+  } else if (e.key === "ArrowRight") {
+    toallaX += 20;
+  }
+  toallaX = Math.max(0, Math.min(canvas.width - toallaWidth, toallaX));
 }
 
-function drawDrops() {
-  ctx.fillStyle = "#c2185b";
-  drops.forEach(drop => {
-    ctx.beginPath();
-    ctx.arc(drop.x, drop.y, drop.size, 0, Math.PI * 2);
-    ctx.fill();
-  });
+document.addEventListener("keydown", moverToalla);
+
+function detectarColision(gota) {
+  return (
+    gota.y + gotaHeight >= toallaY &&
+    gota.x < toallaX + toallaWidth &&
+    gota.x + gotaWidth > toallaX
+  );
 }
 
-function movePad() {
-  if (pad.moveLeft && pad.x > 0) pad.x -= pad.speed;
-  if (pad.moveRight && pad.x + pad.width < canvas.width) pad.x += pad.speed;
-}
+function dibujar() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-function updateDrops() {
-  for (let i = drops.length - 1; i >= 0; i--) {
-    drops[i].y += 2;
-    if (
-      drops[i].y + drops[i].size > pad.y &&
-      drops[i].x > pad.x &&
-      drops[i].x < pad.x + pad.width
-    ) {
-      drops.splice(i, 1);
-      score++;
-    } else if (drops[i].y > canvas.height) {
-      drops.splice(i, 1);
+  // Dibujar toalla
+  ctx.drawImage(toallaImg, toallaX, toallaY, toallaWidth, toallaHeight);
+
+  // Dibujar gotas y actualizar posición
+  for (let i = 0; i < gotas.length; i++) {
+    const gota = gotas[i];
+    gota.y += 3;
+    ctx.drawImage(gotaImg, gota.x, gota.y, gotaWidth, gotaHeight);
+
+    if (detectarColision(gota)) {
+      gotas.splice(i, 1);
+      i--;
+    } else if (gota.y > canvas.height) {
+      gotas.splice(i, 1);
+      i--;
     }
   }
 }
 
-function drawScore() {
-  ctx.fillStyle = "#000";
-  ctx.font = "18px Arial";
-  ctx.fillText("Puntos: " + score, 10, 20);
-}
+setInterval(() => {
+  crearGota();
+}, 1000);
 
 function gameLoop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  movePad();
-  drawPad();
-  drawDrops();
-  updateDrops();
-  drawScore();
+  dibujar();
   requestAnimationFrame(gameLoop);
 }
 
-setInterval(createDrop, 1000);
 gameLoop();
-
-document.addEventListener("keydown", e => {
-  if (e.key === "ArrowLeft") pad.moveLeft = true;
-  if (e.key === "ArrowRight") pad.moveRight = true;
-});
-
-document.addEventListener("keyup", e => {
-  if (e.key === "ArrowLeft") pad.moveLeft = false;
-  if (e.key === "ArrowRight") pad.moveRight = false;
-});
