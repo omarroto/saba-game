@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -7,25 +6,37 @@
     <title>Saba Game</title>
     <style>
       body {
- <img src="assets/saba.png" alt="Toalla Saba" width="100">
-<img src="assets/gota_sangre.png" alt="Gota de sangre" width="40">
-
         margin: 0;
         padding: 0;
         background: #ffeaf4;
         font-family: sans-serif;
+        text-align: center;
       }
       canvas {
         display: block;
-        margin: auto;
+        margin: 20px auto;
         background: #fff0f5;
         border: 2px solid #f06292;
         border-radius: 12px;
+      }
+      .preview-images {
+        margin-top: 10px;
+      }
+      .preview-images img {
+        margin: 0 10px;
+        vertical-align: middle;
       }
     </style>
   </head>
   <body>
     <canvas id="gameCanvas" width="300" height="500"></canvas>
+
+    <!-- Aquí están las imágenes -->
+    <div class="preview-images">
+      <img src="assets/saba.png" alt="Toalla Saba" width="100" />
+      <img src="assets/gota_sangre.png" alt="Gota de sangre" width="40" />
+    </div>
+
     <script src="script.js"></script>
   </body>
 </html>
